@@ -1,0 +1,11 @@
+---
+BasedOnStyle: Mozilla
+IndentWidth: 4
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterControlStatement: Always
+  AfterFunction: true
+  AfterEnum: true
+  AfterClass: true
+  AfterCaseLabel: true
+  BeforeElse: true
