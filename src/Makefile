@@ -1,4 +1,4 @@
-CC=clang
+# CC=clang
 IDIR=../include
 
 PROG=../aoc2023
@@ -13,7 +13,12 @@ DEPS=$(wildcard ${IDIR}/*.h)
 OBJ=$(patsubst %,$(ODIR)/%,$(patsubst %.c,%.o,$(wildcard *.c)))
 
 CFLAGS=-I${IDIR}
-CPPFLAGS=-Wall -Werror -Wunused-but-set-variable -Wunused-variable
+CPPFLAGS=-g -Wall -Werror -Wunused-but-set-variable -Wunused-variable
+
+ifdef DEBUG
+	CPPFLAGS+=-g -DDEBUG=1
+endif
+
 
 all: ${PROG}
 

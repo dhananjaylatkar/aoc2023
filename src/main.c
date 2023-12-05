@@ -4,7 +4,7 @@
 
 #include <aoc.h>
 
-solution solutions[AOC_DAY_MAX] = { day_01 };
+solution solutions[AOC_DAY_MAX] = { day_01, day_02 };
 
 int
 main(int argc, char* argv[])

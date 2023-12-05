@@ -5,9 +5,20 @@
 
 #define AOC_DAY_ALL 0x1FFFFFF
 #define AOC_DAY_MIN 1
-#define AOC_DAY_MAX 1
+#define AOC_DAY_MAX 2
 
 #define AOC_STR_LEN 4096
+#define AOC_INT_MAX 0xFFFFFFFF
+
+#define AOC_MAX(x, y)((x > y) ? x : y)
+#define AOC_MIN(x, y)((x > y) ? y : x)
+
+#ifdef DEBUG
+#define aoc_debug(arg, ...)                                                    \
+    printf("AOC_DEBUG(%s:%d): " arg, __func__, __LINE__, ##__VA_ARGS__)
+#else
+#define aoc_debug(arg, ...)
+#endif /* DEBUG */
 
 enum aoc_err
 {
@@ -18,6 +29,9 @@ enum aoc_err
 
 enum aoc_err
 day_01();
+
+enum aoc_err
+day_02();
 
 typedef enum aoc_err (*solution)();
 
