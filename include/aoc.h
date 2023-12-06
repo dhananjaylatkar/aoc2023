@@ -5,10 +5,12 @@
 
 #define AOC_DAY_ALL 0x1FFFFFF
 #define AOC_DAY_MIN 1
-#define AOC_DAY_MAX 2
+#define AOC_DAY_MAX 3
 
 #define AOC_STR_LEN 4096
 #define AOC_INT_MAX 0xFFFFFFFF
+
+#define AOC_ARR_LEN 200
 
 #define AOC_MAX(x, y)((x > y) ? x : y)
 #define AOC_MIN(x, y)((x > y) ? y : x)
@@ -32,6 +34,9 @@ day_01();
 
 enum aoc_err
 day_02();
+
+enum aoc_err
+day_03();
 
 typedef enum aoc_err (*solution)();
 

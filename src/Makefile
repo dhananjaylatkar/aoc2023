@@ -13,7 +13,7 @@ DEPS=$(wildcard ${IDIR}/*.h)
 OBJ=$(patsubst %,$(ODIR)/%,$(patsubst %.c,%.o,$(wildcard *.c)))
 
 CFLAGS=-I${IDIR}
-CPPFLAGS=-g -Wall -Werror -Wunused-but-set-variable -Wunused-variable
+CPPFLAGS=
 
 ifdef DEBUG
 	CPPFLAGS+=-g -DDEBUG=1

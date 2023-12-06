@@ -54,3 +54,4 @@ dkms.conf
 # misc
 aoc2023
 log
+core.*

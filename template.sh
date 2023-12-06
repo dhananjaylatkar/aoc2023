@@ -36,8 +36,8 @@ day_${DAY}()
 
     fclose(fp);
 
-    printf(\"D\" DAY \"P1: \%d\\n\", res[0]);
-    printf(\"D\" DAY \"P2: \%d\\n\", res[1]);
+    printf(\"D\" DAY \"P1: %d\\n\", res[0]);
+    printf(\"D\" DAY \"P2: %d\\n\", res[1]);
 
     return AOC_SUCCESS;
 }
