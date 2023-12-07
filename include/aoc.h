@@ -12,8 +12,19 @@
 
 #define AOC_ARR_LEN 200
 
-#define AOC_MAX(x, y)((x > y) ? x : y)
-#define AOC_MIN(x, y)((x > y) ? y : x)
+#define AOC_MAX(x, y) ((x > y) ? x : y)
+#define AOC_MIN(x, y) ((x > y) ? y : x)
+
+#define AOC_DIR_RIGHT {0, 1}
+#define AOC_DIR_LEFT {0, -1}
+#define AOC_DIR_DOWN {1, 0}
+#define AOC_DIR_UP {-1, 0}
+#define AOC_DIR_RIGHT_UP {-1, 1}
+#define AOC_DIR_RIGHT_DOWN {1, 1}
+#define AOC_DIR_LEFT_UP {-1, -1}
+#define AOC_DIR_LEFT_DOWN {1, -1}
+
+#define AOC_IS_DIGIT(c) (c >= '0' && c <= '9')
 
 #ifdef DEBUG
 #define aoc_debug(arg, ...)                                                    \
@@ -21,6 +32,19 @@
 #else
 #define aoc_debug(arg, ...)
 #endif /* DEBUG */
+
+enum aoc_dir
+{
+    AOC_DIR_RIGHT_ENUM = 0,
+    AOC_DIR_LEFT_ENUM,
+    AOC_DIR_DOWN_ENUM,
+    AOC_DIR_UP_ENUM,
+    AOC_DIR_RIGHT_UP_ENUM,
+    AOC_DIR_RIGHT_DOWN_ENUM,
+    AOC_DIR_LEFT_UP_ENUM,
+    AOC_DIR_LEFT_DOWN_ENUM,
+    AOC_DIR_MAX_ENUM
+};
 
 enum aoc_err
 {
