@@ -27,7 +27,7 @@ day_04()
         int points = 0;
         int winning_nums[AOC_ARR_LEN];
 
-        aoc_debug("%s\n", &line);
+        aoc_debug("%s\n", &line[0]);
 
         /* go to the start of winning numbers */
         while (line[i] != ':')
