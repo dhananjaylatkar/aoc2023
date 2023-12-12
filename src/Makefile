@@ -6,7 +6,7 @@ PROG=../aoc2023
 ODIR=obj
 
 LDIR=
-LIBS=
+LIBS=-lm
 
 DEPS=$(wildcard ${IDIR}/*.h)
 
