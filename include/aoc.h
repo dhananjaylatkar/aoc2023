@@ -15,6 +15,7 @@
 #define AOC_MAX(x, y) ((x > y) ? x : y)
 #define AOC_MIN(x, y) ((x > y) ? y : x)
 
+// clang-format off
 #define AOC_DIR_RIGHT {0, 1}
 #define AOC_DIR_LEFT {0, -1}
 #define AOC_DIR_DOWN {1, 0}
@@ -23,6 +24,7 @@
 #define AOC_DIR_RIGHT_DOWN {1, 1}
 #define AOC_DIR_LEFT_UP {-1, -1}
 #define AOC_DIR_LEFT_DOWN {1, -1}
+// clang-format on
 
 #define AOC_IS_DIGIT(c) (c >= '0' && c <= '9')
 
@@ -52,7 +54,8 @@ enum aoc_err
 {
     AOC_SUCCESS = 0,
     AOC_INVALID_ARGS,
-    AOC_INPUT_FILE_NOT_FOUND
+    AOC_INPUT_FILE_NOT_FOUND,
+    AOC_TOO_MANY_INPUT_LINES
 };
 
 enum aoc_err
