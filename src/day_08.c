@@ -12,6 +12,7 @@
 #define MAX_NAVIGATION 1000
 
 #define LOC_TO_DEC(z, y, x) ((676 * (z - 'A')) + (26 * (y - 'A') + (x - 'A')))
+#define ENDS_WITH_Z(loc) ((curr_loc % 26 == 25))
 
 enum dir
 {
@@ -124,7 +125,7 @@ day_08()
     {
         nav_i = 0;
         curr_loc = start_locs[i];
-        while (curr_loc % 26 != 25)
+        while (!ENDS_WITH_Z(loc))
         {
             curr_loc = network[curr_loc][nav[nav_i]];
             nav_i = (nav_i + 1) % nav_cnt;
