@@ -42,6 +42,8 @@ get_pipe_type(char p)
 }
 
 int p1 = 0;
+bool path[AOC_ARR_LEN][AOC_ARR_LEN];
+
 void
 dfs(enum pipe_t ground[AOC_ARR_LEN][AOC_ARR_LEN],
     bool visited[AOC_ARR_LEN][AOC_ARR_LEN],
@@ -51,28 +53,76 @@ dfs(enum pipe_t ground[AOC_ARR_LEN][AOC_ARR_LEN],
     int y,
     int curr_dist)
 {
-    if (!VALID_COORD(x, y) || visited[x][y] || ground[x][y] >= PIPE_NONE)
-        return;
-
     if (ground[x][y] == PIPE_S)
     {
+        int prev = p1;
         p1 = AOC_MAX(p1, curr_dist);
+        if (prev != p1)
+        {
+            memcpy(path, visited, sizeof(path));
+        }
         return;
     }
-
-    visited[x][y] = true;
 
     for (int i = 0; i < 2; i++)
     {
         int new_x = x + dirs[ground[x][y]][i][0];
         int new_y = y + dirs[ground[x][y]][i][1];
 
-        dfs(ground, visited, m, n, new_x, new_y, curr_dist + 1);
-    }
+        if (!VALID_COORD(new_x, new_y) || visited[new_x][new_y] ||
+            ground[new_x][new_y] >= PIPE_NONE)
+            continue;
 
-    visited[x][y] = false;
+        visited[new_x][new_y] = true;
+        dfs(ground, visited, m, n, new_x, new_y, curr_dist + 1);
+        visited[new_x][new_y] = false;
+    }
 }
 
+static void
+print_path(enum pipe_t ground[AOC_ARR_LEN][AOC_ARR_LEN], int m, int n)
+{
+    for (int k = 0; k < m; k++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (path[k][j])
+            {
+                switch (ground[k][j])
+                {
+                    case PIPE_VERTICAL:
+                        aoc_debug_s("|");
+                        break;
+                    case PIPE_HORIZONTAL:
+                        aoc_debug_s("-");
+                        break;
+                    case PIPE_TOP_LEFT:
+                        aoc_debug_s("┌");
+                        break;
+                    case PIPE_TOP_RIGHT:
+                        aoc_debug_s("┐");
+                        break;
+                    case PIPE_BOT_LEFT:
+                        aoc_debug_s("└");
+                        break;
+                    case PIPE_BOT_RIGHT:
+                        aoc_debug_s("┘");
+                        break;
+                    case PIPE_S:
+                        aoc_debug_s("S");
+                        break;
+                    case PIPE_NONE:
+                        aoc_debug_s(".");
+                        break;
+                }
+            }
+
+            else
+                aoc_debug_s(".");
+        }
+        aoc_debug_s("\n");
+    }
+}
 enum aoc_err
 day_10()
 {
@@ -159,20 +209,69 @@ day_10()
     for (int i = 0; i < s_dirs_cnt; i++)
     {
         bool visited[AOC_ARR_LEN][AOC_ARR_LEN] = { 0 };
-        if (p1 != 0)
+        int _x = start[0] + s_dirs[i][0];
+        int _y = start[1] + s_dirs[i][1];
+        visited[_x][_y] = true;
+        dfs(ground, visited, m, n, _x, _y, 1);
+
+        if (p1)
         {
+            print_path(ground, m, n);
             break;
         }
-        dfs(ground,
-            visited,
-            m,
-            n,
-            start[0] + s_dirs[i][0],
-            start[1] + s_dirs[i][1],
-            1);
     }
 
+    /* part 1 */
     res[0] = (p1 % 2 == 0) ? p1 / 2 : (p1 / 2) + 1;
+
+    /* replace start with appropriate PIPE */
+    ground[start[0]][start[1]] = PIPE_TOP_LEFT;
+
+    /* part 2 */
+    for (int i = 0; i < m; i++)
+    {
+        enum pipe_t prev_corner = PIPE_MAX;
+        bool in = false;
+        for (int j = 0; j < n; j++)
+        {
+
+            if (path[i][j] == false)
+            {
+                /* not part of path and position is inside loop */
+                if (in)
+                    res[1]++;
+            }
+            else
+            {
+                /* keep track of current position */
+                switch (ground[i][j])
+                {
+                    case PIPE_VERTICAL:
+                        in = !in;
+                        break;
+                    case PIPE_TOP_LEFT:
+                    case PIPE_BOT_LEFT:
+                        in = !in;
+                        prev_corner = ground[i][j];
+                        break;
+                    case PIPE_TOP_RIGHT:
+                        if (prev_corner != PIPE_BOT_LEFT)
+                            in = !in;
+                        prev_corner = ground[i][j];
+                        break;
+                    case PIPE_BOT_RIGHT:
+                        if (prev_corner != PIPE_TOP_LEFT)
+                            in = !in;
+                        prev_corner = ground[i][j];
+                        break;
+                    case PIPE_HORIZONTAL:
+                    case PIPE_S:
+                    case PIPE_NONE:
+                        break;
+                }
+            }
+        }
+    }
 
     printf("D" DAY "P1: %d\n", res[0]);
     printf("D" DAY "P2: %d\n", res[1]);
