@@ -6,12 +6,6 @@
 
 #define DAY "11"
 
-enum pixel
-{
-    SPACE = 0,
-    GALAXY = 1,
-};
-
 static int
 comparator(const void* _g1, const void* _g2)
 {
@@ -51,7 +45,7 @@ get_sum_of_dist(unsigned long long int galaxy_loc[AOC_ARR_LEN * AOC_ARR_LEN][2],
     for (int i = 0; i < galaxy_loc_cnt; i++)
     {
         if (galaxy_loc[i][0] > prev + 1)
-            e += expansion * (galaxy_loc[i][0] - prev - 1);
+            e += (expansion - 1) * (galaxy_loc[i][0] - prev - 1);
 
         prev = galaxy_loc[i][0];
         galaxy_loc[i][0] += e;
@@ -65,7 +59,7 @@ get_sum_of_dist(unsigned long long int galaxy_loc[AOC_ARR_LEN * AOC_ARR_LEN][2],
     for (int i = 0; i < galaxy_loc_cnt; i++)
     {
         if (galaxy_loc[i][1] > prev + 1)
-            e += expansion * (galaxy_loc[i][1] - prev - 1);
+            e += (expansion - 1) * (galaxy_loc[i][1] - prev - 1);
 
         prev = galaxy_loc[i][1];
         galaxy_loc[i][1] += e;
@@ -79,7 +73,7 @@ get_sum_of_dist(unsigned long long int galaxy_loc[AOC_ARR_LEN * AOC_ARR_LEN][2],
               get_dist(galaxy_loc[i][0], galaxy_loc[j][0]) +
               get_dist(galaxy_loc[i][1], galaxy_loc[j][1]);
 
-            aoc_debug("G1=(%3lld, %3lld) G2=(%3lld, %3lld) dist=%3lld\n",
+            aoc_debug("G1=(%lld, %lld) G2=(%lld, %lld) dist=%lld\n",
                       galaxy_loc[i][0],
                       galaxy_loc[i][1],
                       galaxy_loc[j][0],
@@ -98,8 +92,9 @@ day_11()
 {
     FILE* fp;
     char line[AOC_STR_LEN];
-    int res[2] = { 0, 0 };
+    unsigned long long int res[2] = { 0, 0 };
     unsigned long long int galaxy_loc[AOC_ARR_LEN * AOC_ARR_LEN][2];
+    unsigned long long int galaxy_loc_cpy[AOC_ARR_LEN * AOC_ARR_LEN][2];
     int galaxy_loc_cnt = 0;
     int m = 0;
     int n = 0;
@@ -136,10 +131,14 @@ day_11()
 
     aoc_debug("m=%d n=%d galaxies=%d\n", m, n, galaxy_loc_cnt);
 
-    res[0] = get_sum_of_dist(galaxy_loc, galaxy_loc_cnt, 1);
+    memcpy(galaxy_loc_cpy, galaxy_loc, sizeof(galaxy_loc));
+    res[0] = get_sum_of_dist(galaxy_loc_cpy, galaxy_loc_cnt, 2);
 
-    printf("D" DAY "P1: %d\n", res[0]);
-    printf("D" DAY "P2: %d\n", res[1]);
+    memcpy(galaxy_loc_cpy, galaxy_loc, sizeof(galaxy_loc));
+    res[1] = get_sum_of_dist(galaxy_loc_cpy, galaxy_loc_cnt, 1000000);
+
+    printf("D" DAY "P1: %lld\n", res[0]);
+    printf("D" DAY "P2: %lld\n", res[1]);
 
     return AOC_SUCCESS;
 }
