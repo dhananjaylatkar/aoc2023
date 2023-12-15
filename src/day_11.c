@@ -12,17 +12,12 @@ comparator(const void* _g1, const void* _g2)
     unsigned long long int* g1 = (unsigned long long int*)_g1;
     unsigned long long int* g2 = (unsigned long long int*)_g2;
 
-    if (g1[1] < g2[1])
+    if (g1[1] == g2[1])
     {
-        return -1;
+        return g1[0] - g2[0];
     }
 
-    if (g1[1] > g2[1])
-    {
-        return 1;
-    }
-
-    return g1[0] - g2[0];
+    return g1[1] - g2[1];
 }
 
 static unsigned long long int
