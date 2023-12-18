@@ -5,7 +5,7 @@
 
 #define AOC_DAY_ALL 0x1FFFFFF
 #define AOC_DAY_MIN 1
-#define AOC_DAY_MAX 11
+#define AOC_DAY_MAX 12
 
 #define AOC_STR_LEN 4096
 #define AOC_INT_MAX 0xFFFFFFFF
@@ -91,6 +91,9 @@ day_10();
 
 enum aoc_err
 day_11();
+
+enum aoc_err
+day_12();
 
 typedef enum aoc_err (*solution)();
 
