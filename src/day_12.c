@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,176 +13,136 @@ enum spring_t
     SPRING_OPERATIONAL = 0,
     SPRING_DAMAGED = 1,
     SPRING_UNKNOWN = 2,
-    SPRING_CHANGED_OPERATIONAL = 3,
-    SPRING_CHANGED_DAMAGED = 4,
     SPRING_MAX
 };
 
-#define OPERATIONAL(x)                                                         \
-    ((x) == SPRING_CHANGED_OPERATIONAL || (x) == SPRING_OPERATIONAL)
-#define DAMAGED(x) ((x) == SPRING_CHANGED_DAMAGED || (x) == SPRING_DAMAGED)
-
-bool
-group_fits(enum spring_t springs[AOC_ARR_LEN],
-           int springs_cnt,
-           int springs_i,
-           int group)
+static bool
+operational_spring_in_range(const enum spring_t springs[],
+                            const int start,
+                            const int end)
 {
-    int group_end = springs_i + group;
-
-    if (group_end > springs_cnt)
-        return false;
-
-    for (int i = springs_i; i < group_end && i < springs_cnt; i++)
+    for (int i = start; i < end; i++)
     {
-        if (springs[i] != SPRING_UNKNOWN && springs[i] != SPRING_DAMAGED)
+        if (springs[i] == SPRING_OPERATIONAL)
         {
-            return false;
+            return true;
+        }
+    }
+    return false;
+}
+
+unsigned long long int dp[(AOC_ARR_LEN * 5) + 4 + 1][(AOC_ARR_LEN * 5) + 1];
+
+static unsigned long long int
+count(const enum spring_t springs[],
+      const int groups[],
+      const int springs_cnt,
+      const int groups_cnt,
+      int si,
+      int gi)
+{
+    if (dp[si][gi] != -1)
+    {
+        return dp[si][gi];
+    }
+
+    if (gi == groups_cnt)
+    {
+        for (int i = si; i < springs_cnt; i++)
+        {
+            if (springs[i] == SPRING_DAMAGED)
+                return 0;
+        }
+        return 1;
+    }
+
+    if (si == springs_cnt)
+    {
+        if (gi == groups_cnt)
+        {
+            return 1;
+        }
+        return 0;
+    }
+
+    unsigned long long int res = 0;
+    enum spring_t cur_spring = springs[si];
+
+    if (cur_spring == SPRING_OPERATIONAL || cur_spring == SPRING_UNKNOWN)
+    {
+        res += count(springs, groups, springs_cnt, groups_cnt, si + 1, gi);
+    }
+
+    if (cur_spring == SPRING_DAMAGED || cur_spring == SPRING_UNKNOWN)
+    {
+        int cur_group = groups[gi];
+        int group_end = si + cur_group;
+
+        if (group_end <= springs_cnt &&
+            !operational_spring_in_range(springs, si, group_end) &&
+            (group_end == springs_cnt || springs[group_end] != SPRING_DAMAGED))
+        {
+            res += count(
+              springs, groups, springs_cnt, groups_cnt, group_end + 1, gi + 1);
         }
     }
 
-    if (group_end < springs_cnt && DAMAGED(springs[group_end]))
-    {
-        return false;
-    }
-
-    return true;
+    dp[si][gi] = res;
+    return res;
 }
 
 static void
-insert_group(enum spring_t springs[AOC_ARR_LEN],
-             int springs_cnt,
-             int springs_i,
-             int group)
-{
-    int group_end = springs_i + group;
+create_input_for_part2(const enum spring_t springs1[],
+                       const int groups1[],
+                       enum spring_t springs2[],
+                       int groups2[],
+                       const int springs_cnt,
+                       const int groups_cnt)
 
-    for (int i = springs_i; i < group_end && i < springs_cnt; i++)
-    {
-        if (springs[i] == SPRING_UNKNOWN)
-        {
-            springs[i] = SPRING_CHANGED_DAMAGED;
-        }
-    }
-
-    if (group_end < springs_cnt && springs[group_end] == SPRING_UNKNOWN)
-    {
-        springs[group_end] = SPRING_CHANGED_OPERATIONAL;
-    }
-}
-
-static void
-remove_group(enum spring_t springs[AOC_ARR_LEN],
-             int springs_cnt,
-             int springs_i,
-             int group)
-{
-    int group_end = springs_i + group;
-
-    for (int i = springs_i; i < group_end && i < springs_cnt; i++)
-    {
-        if (springs[i] == SPRING_CHANGED_DAMAGED)
-        {
-            springs[i] = SPRING_UNKNOWN;
-        }
-    }
-
-    if (group_end < springs_cnt &&
-        springs[group_end] == SPRING_CHANGED_OPERATIONAL)
-    {
-        springs[group_end] = SPRING_UNKNOWN;
-    }
-}
-
-int ways = 0;
-static void
-count(enum spring_t springs[AOC_ARR_LEN],
-      int groups[AOC_ARR_LEN],
-      int springs_cnt,
-      int groups_cnt,
-      int springs_i,
-      int groups_i)
 {
 
-    aoc_debug_s("spings: ");
-    for (int i = 0; i < springs_cnt; i++)
+    int k = 0;
+    int times = 0;
+    while (1)
     {
-        aoc_debug_s("%d ", springs[i]);
-    }
-    aoc_debug_s("\n");
-
-    aoc_debug_s("groups: ");
-    for (int i = 0; i < groups_cnt; i++)
-    {
-        aoc_debug_s("%d ", groups[i]);
-    }
-    aoc_debug_s("\n");
-    aoc_debug("si=%d gi=%d sc=%d gc=%d\n",
-              springs_i,
-              groups_i,
-              springs_cnt,
-              groups_cnt);
-
-    if (groups_i == groups_cnt)
-    {
-        for (int i = springs_i; i < springs_cnt; i++)
+        int j = 0;
+        while (j < springs_cnt)
         {
-            if (DAMAGED(springs[i]))
-                return;
+            springs2[k++] = springs1[j++];
         }
-        ways++;
-        aoc_debug("ways=%d\n", ways);
-        return;
+
+        times++;
+        if (times == 5)
+            break;
+
+        springs2[k++] = SPRING_UNKNOWN;
     }
 
-    if (springs_i >= springs_cnt)
+    k = 0;
+    times = 0;
+    while (1)
     {
-        aoc_debug("out of bounds\n");
-        return;
-    }
-
-    int group = groups[groups_i];
-    if (springs_i == 0 || (OPERATIONAL(springs[springs_i - 1]) ||
-                           springs[springs_i - 1] == SPRING_UNKNOWN) &&
-                            !OPERATIONAL(springs[springs_i]))
-    {
-        if (group_fits(springs, springs_cnt, springs_i, group))
+        int j = 0;
+        while (j < groups_cnt)
         {
-            aoc_debug("group=%d fits at %d\n", group, springs_i);
-
-            insert_group(springs, springs_cnt, springs_i, group);
-
-            count(springs,
-                  groups,
-                  springs_cnt,
-                  groups_cnt,
-                  springs_i + groups[groups_i] + 1,
-                  groups_i + 1);
-
-            remove_group(springs, springs_cnt, springs_i, group);
+            groups2[k++] = groups1[j++];
         }
-        else
-        {
-            aoc_debug("group=%d does not fit at %d\n", group, springs_i);
-        }
+
+        times++;
+        if (times == 5)
+            break;
     }
-    else
-    {
-        aoc_debug("group=%d does not fit at %d\n", group, springs_i);
-        // aoc_debug("prev_spring=%d spring=%d condition1=%d condition2=%d\n",
-        // springs[springs_i - 1], springs[springs_i], );
-    }
-    count(springs, groups, springs_cnt, groups_cnt, springs_i + 1, groups_i);
 }
-
 enum aoc_err
 day_12()
 {
     FILE* fp;
     char line[AOC_STR_LEN];
-    int res[2] = { 0, 0 };
-    enum spring_t springs[AOC_ARR_LEN];
-    int groups[AOC_ARR_LEN];
+    unsigned long long int res[2] = { 0, 0 };
+    enum spring_t springs1[AOC_ARR_LEN];
+    enum spring_t springs2[AOC_ARR_LEN * 5 + 4];
+    int groups1[AOC_ARR_LEN];
+    int groups2[AOC_ARR_LEN * 5];
     int springs_cnt;
     int groups_cnt;
 
@@ -204,13 +165,13 @@ day_12()
             switch (line[i])
             {
                 case '.':
-                    springs[springs_cnt] = SPRING_OPERATIONAL;
+                    springs1[springs_cnt] = SPRING_OPERATIONAL;
                     break;
                 case '#':
-                    springs[springs_cnt] = SPRING_DAMAGED;
+                    springs1[springs_cnt] = SPRING_DAMAGED;
                     break;
                 case '?':
-                    springs[springs_cnt] = SPRING_UNKNOWN;
+                    springs1[springs_cnt] = SPRING_UNKNOWN;
                     break;
             }
             springs_cnt++;
@@ -222,7 +183,7 @@ day_12()
 
         while (line[i] != '\n' && line[i] != '\0')
         {
-            groups[groups_cnt++] = atoi(&line[i]);
+            groups1[groups_cnt++] = atoi(&line[i]);
 
             while (line[i] != ',' && line[i] != '\n' && line[i] != '\0')
                 i++;
@@ -230,16 +191,29 @@ day_12()
             if (line[i] == ',')
                 i++;
         }
-        ways = 0;
-        count(springs, groups, springs_cnt, groups_cnt, 0, 0);
-        res[0] += ways;
-        printf("%d\n", ways);
+        aoc_debug("%s", &line[0]);
+
+        create_input_for_part2(
+          springs1, groups1, springs2, groups2, springs_cnt, groups_cnt);
+
+        memset(dp, -1, sizeof(dp));
+        unsigned long long int c1 =
+          count(springs1, groups1, springs_cnt, groups_cnt, 0, 0);
+        aoc_debug("c1=%d\n", c1);
+
+        memset(dp, -1, sizeof(dp));
+        unsigned long long int c2 = count(
+          springs2, groups2, ((springs_cnt * 5) + 4), groups_cnt * 5, 0, 0);
+        aoc_debug("c2=%d\n", c2);
+
+        res[0] += c1;
+        res[1] += c2;
     }
 
     fclose(fp);
 
-    printf("D" DAY "P1: %d\n", res[0]);
-    printf("D" DAY "P2: %d\n", res[1]);
+    printf("D" DAY "P1: %lld\n", res[0]);
+    printf("D" DAY "P2: %lld\n", res[1]);
 
     return AOC_SUCCESS;
 }
